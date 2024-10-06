@@ -1,0 +1,98 @@
+// auth.js (Backend)
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User'); // Assuming you have a User model in models/User.js
+
+const router = express.Router();
+require('dotenv').config(); // Load environment variables
+
+// Middleware to authenticate token
+const authenticate = (req, res, next) => {
+  const token = req.header('Authorization');
+  if (!token) {
+    return res.status(403).json({ message: 'No token provided' });
+  }
+
+  const bearer = token.split(' ');  // Splitting the token
+  const actualToken = bearer[1];  // Get the token part
+
+  jwt.verify(actualToken, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    req.userId = decoded.id;  // Attach decoded user ID
+    next();
+  });
+};
+
+// Get user details using token
+router.get('/me', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('name email phone');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);  // Send back user details
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Signup route
+router.post('/signup', async (req, res) => {
+  const { name, phone, email, password, state, city, pincode, localAddress } = req.body;
+  
+  console.log('Signup Request Body:', req.body); // Debugging log
+
+  try {
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+          return res.status(400).json({ message: 'Email already in use' });
+      }
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Password Hashed:', hashedPassword); // Debugging log
+
+      // Create new user
+      const newUser = new User({
+          name,
+          phone,
+          email,
+          password: hashedPassword,
+          state,
+          city,
+          pincode,
+          localAddress,
+      });
+
+      await newUser.save();
+      res.status(201).json({ message: 'User created successfully!' });
+  } catch (error) {
+      console.error('Error during signup:', error); // Log detailed error
+      res.status(500).json({ error: error.message });
+  }
+});
+
+// Login route
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'User not found!' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials!' });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({ token, user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+module.exports = router;

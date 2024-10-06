@@ -1,0 +1,495 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import { load } from '@cashfreepayments/cashfree-js';
+import { useCart } from '../contexts/CartContext'; 
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+
+function SingleProductPage() {
+    const [product, setProduct] = useState(null);
+    const [selectedImage, setSelectedImage] = useState('');
+    const { id } = useParams();
+    const { addToCart, cart } = useCart(); 
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+                setProduct(response.data);
+                if (response.data.images && response.data.images.length > 0) {
+                    setSelectedImage(response.data.images[0]);
+                }
+            } catch (error) {
+                console.error('Error fetching product:', error);
+            }
+        };
+
+        fetchProduct();
+    }, [id]);
+
+    const handlePayment = async () => {
+        if (!product) return;
+
+        const paymentData = {
+            orderAmount: product.price,
+            customerDetails: {
+                customer_id: 'webcodder01',
+                customer_phone: '9999999999',
+                customer_name: 'Web Codder',
+                customer_email: 'webcodder@example.com',
+            },
+        };
+
+        try {
+            const response = await axios.post('http://localhost:5000/api/payment/initiate', paymentData);
+            const { payment_session_id } = response.data;
+
+            if (payment_session_id) {
+                const cashfree = await load({ mode: 'sandbox' });
+                cashfree.checkout({
+                    paymentSessionId: payment_session_id,
+                    redirectTarget: '_modal',
+                }).then((res) => {
+                    console.log('Payment initialized', res);
+                }).catch(err => {
+                    console.error('Error during checkout:', err);
+                });
+            }
+        } catch (error) {
+            console.error('Payment initiation error:', error);
+        }
+    };
+
+    const handleAddToCart = () => {
+        if (product) {
+            const productToAdd = {
+                id: product._id, // Assuming product has an _id field from MongoDB
+                title: product.title,
+                price: product.price,
+                images: product.images, // Add images if necessary for cart display
+            };
+        
+        const isProductInCart = cart.some(item => item.id === productToAdd.id);
+
+            if (isProductInCart) {
+                alert(`${product.title} is already in your cart!`); // You can replace this with a toast message
+            } else {
+                addToCart(productToAdd);
+                alert(`${product.title} has been added to your cart!`);
+            }
+        }
+    };
+
+    if (!product) return <div>Loading...</div>;
+
+    return (
+        <div>
+    <Navbar />
+    <div className='lg:flex lg:flex-row mt-10 sm:flex sm:flex-col'>
+        <div className="lg:flex lg:flex-row sm:flex sm:flex-col-reverse">
+            <div className="lg:flex lg:flex-col gap-2 space-y-5 mr-7 mt-10 sm:flex sm:flex-row sm:overflow-x-scroll lg:overflow-hidden">
+                {product.images.map((image, index) => (
+                    <img
+                        key={index}
+                        src={`http://localhost:5000/${image}`}
+                        alt={`product-${index}`}
+                        onClick={() => setSelectedImage(image)}
+                        className="cursor-pointer h-20 w-20 object-cover border rounded-lg" // Adjusted sizes for thumbnails
+                    />
+                ))}
+            </div>
+            <div className="flex-1 sm:w-full">
+                <img
+                    src={`http://localhost:5000/${selectedImage}`}
+                    alt="Selected"
+                    className="w-96 h-96 max-w-full border rounded-lg" // Fixed size for the selected image
+                />
+            </div>
+        </div>
+        <div className="mt-6 ml-7 lg:w-1/2 sm:w-full">
+            <h1 className="text-2xl font-bold mb-6">{product.title}</h1> {/* Decreased font size */}
+            <p className="mt-4 text-gray-700 text-sm">{product.disc}</p> {/* Decreased font size */}
+            <br/>
+            <br/>
+            <hr />
+            <br/>
+            <br/>
+
+            <div className='flex flex-row gap-2 mt-2'>
+                <p className="text-red-300 text-lg font-light">-{product.offer}%</p> 
+                <p className="text-2xl font-normal">{product.price}</p> 
+            </div>
+            
+            <hr />
+            <div className='flex flex-col lg:w-96 sm:w-64'>
+                <button onClick={handlePayment} className="mt-4 bg-amber-500 text-white py-2 px-6 rounded-full text-lg">
+                    Buy Now
+                </button>
+                <button onClick={handleAddToCart} className="mt-4 bg-amber-300 text-white py-2 px-6 rounded-full text-lg">
+                    Add To Cart
+                </button>
+            </div>
+        </div>
+    </div>
+    <Footer/>
+</div>
+
+    );
+}
+
+export default SingleProductPage;
+
+
+//addproduct
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function ProductPage() {
+  const [title, setTitle] = useState('');
+  const [price, setPrice] = useState('');
+  const [offer, setOffer] = useState('');
+  const [disc, setDisc] = useState('');
+  const [category, setCategory] = useState('');
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [uploadStatus, setUploadStatus] = useState('');
+
+  useEffect(() => {
+    // Fetch products on component mount
+    axios.get('http://localhost:5000/api/products')
+      .then(response => setProducts(response.data))
+      .catch(error => console.error('Error fetching products:', error));
+  }, []);
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedImages(files);
+
+    const previews = files.map(file => URL.createObjectURL(file));
+    setPreviewImages(previews);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('price', price);
+    formData.append('offer', offer);
+    formData.append('disc', disc);
+    formData.append('category', category);
+    selectedImages.forEach(image => {
+      formData.append('images', image);
+    });
+
+    axios.post('http://localhost:5000/api/products', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+      .then(response => {
+        setUploadStatus('Product uploaded successfully!');
+        setTitle('');
+        setPrice('');
+        setOffer('');
+        setDisc('');
+        setCategory('');
+        setSelectedImages([]);
+        setPreviewImages([]);
+        setProducts([...products, response.data]);
+      })
+      .catch(error => {
+        console.error('Error uploading product:', error.response ? error.response.data : error.message);
+        setUploadStatus('Failed to upload product.');
+      });
+  };
+
+  return (
+    <div>
+      <h1>Product Upload and Display</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Title:
+          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
+        </label>
+        <br />
+        <label>
+          Price:
+          <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+        </label>
+        <br />
+        <label>
+          Offer (%):
+          <input type="number" value={offer} onChange={(e) => setOffer(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          Description:
+          <textarea value={disc} onChange={(e) => setDisc(e.target.value)} required />
+        </label>
+        <br />
+        <label>
+          Category:
+          <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required />
+        </label>
+        <br />
+        <label>
+          Select Images:
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        </label>
+        <br />
+        <button type="submit">Upload Product</button>
+      </form>
+      <div>
+        <h2>Image Previews</h2>
+        <div className="image-previews">
+          {previewImages.map((preview, index) => (
+            <img
+              key={index}
+              src={preview}
+              alt={`Preview ${index}`}
+              style={{ width: '150px', height: 'auto', margin: '5px' }}
+            />
+          ))}
+        </div>
+      </div>
+      {uploadStatus && <p>{uploadStatus}</p>}
+      <div>
+        <h2>Uploaded Products</h2>
+        <div className="products-list">
+          {products.map(product => (
+            <div key={product._id} className="product-card">
+              <img src={`http://localhost:5000/${product.images[0]}`} alt={product.title} style={{ width: '150px', height: 'auto' }} />
+              <h2>{product.title}</h2>
+              <p>${product.price}</p>
+              {product.offer > 0 && <p>Offer: {product.offer}%</p>}
+              <p>{product.disc}</p>
+              <p>Category: {product.category}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default ProductPage;
+
+//server.js
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const productRoutes = require('./routes/products');
+const path = require('path');
+require('dotenv').config();
+const axios = require('axios');
+const crypto = require('crypto');
+
+//paymentrout
+const paymentRoutes = require('./routes/payment');
+//server
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Serve static files (images) from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Ensure uploads directory exists
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // Adjust this as needed
+}));
+app.use(bodyParser.json());
+app.use('/api/products', productRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use(express.urlencoded({extended: true}))
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+// routes/payment.js
+const express = require('express');
+const router = express.Router();
+const crypto = require('crypto');
+const { Cashfree } = require('cashfree-pg');
+
+// Configure Cashfree
+Cashfree.XClientId = process.env.CLIENT_ID;
+Cashfree.XClientSecret = process.env.CLIENT_SECRET;
+Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
+
+// Function to generate a unique order ID
+function generateOrderId() {
+    const uniqueId = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.createHash('sha256');
+    hash.update(uniqueId);
+    return hash.digest('hex').substr(0, 12);
+}
+
+// Payment initiation route
+router.post('/initiate', async (req, res) => {
+    const { orderAmount, customerDetails } = req.body;
+
+    if (!orderAmount || !customerDetails) {
+        return res.status(400).json({ message: "Order amount and customer details are required." });
+    }
+
+    const request = {
+        order_id: generateOrderId(),
+        order_amount: orderAmount,
+        order_currency: 'INR',
+        customer_details: customerDetails,
+    };
+
+    try {
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Payment initiation error:', error);
+        res.status(500).json({ error: 'Payment initiation failed', details: error.message });
+    }
+});
+
+// Payment verification route
+router.post('/verify', async (req, res) => {
+    const { orderId } = req.body;
+
+    try {
+        const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        res.status(500).json({ message: "Error verifying payment." });
+    }
+});
+
+module.exports = router;
+
+
+
+
+
+
+
+WORKING CODE IN SINGLE PAGE 
+
+
+// Import required modules
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const path = require('path');
+const crypto = require('crypto');
+const { Cashfree } = require('cashfree-pg');
+require('dotenv').config();
+const fs = require('fs');
+
+// Initialize the Express app
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Configure Cashfree
+Cashfree.XClientId = process.env.CLIENT_ID;
+Cashfree.XClientSecret = process.env.CLIENT_SECRET;
+Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
+
+// Middleware
+app.use(cors({
+    origin: 'http://localhost:3000', // Adjust this based on your frontend URL
+}));
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (e.g., images) from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+// Function to generate a unique order ID
+function generateOrderId() {
+    const uniqueId = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.createHash('sha256');
+    hash.update(uniqueId);
+    return hash.digest('hex').substr(0, 12);
+}
+
+// Payment initiation route
+app.post('/api/payment/initiate', async (req, res) => {
+    const { orderAmount, customerDetails } = req.body;
+
+    if (!orderAmount || !customerDetails) {
+        return res.status(400).json({ message: "Order amount and customer details are required." });
+    }
+
+    const request = {
+        order_id: generateOrderId(),
+        order_amount: orderAmount,
+        order_currency: 'INR',
+        customer_details: customerDetails,
+    };
+
+    try {
+        const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Payment initiation error:', error); // Log the error for debugging
+        res.status(500).json({ error: 'Payment initiation failed', details: error.message });
+    }
+});
+
+// Payment verification route (if needed)
+app.post('/api/payment/verify', async (req, res) => {
+    const { orderId } = req.body;
+
+    try {
+        const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        res.status(500).json({ message: "Error verifying payment." });
+    }
+});
+
+// Products route (Import your products route file here)
+const productRoutes = require('./routes/products');
+app.use('/api/products', productRoutes);
+
+// Home route
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
