@@ -19,7 +19,7 @@ const upload = multer({ storage: storage });
 // Create a new product with images
 router.post('/', upload.array('images', 8), async (req, res) => {
   try {
-    if (!req.files) {
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'No files uploaded.' });
     }
 
@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
     const products = await Product.find();
     res.json(products);
   } catch (error) {
-    console.error('Error fetching products:', error); // Log error details
+    console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
   }
 });
@@ -51,43 +51,32 @@ router.get('/:id', async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (error) {
-    console.error('Error fetching product:', error); // Log error details
+    console.error('Error fetching product:', error);
     res.status(500).json({ message: 'Failed to fetch product', error: error.message });
   }
 });
 
-/** Update a product by ID
+// Update a product by ID
 router.put('/:id', upload.array('images', 5), async (req, res) => {
   try {
-    const images = req.files ? req.files.map(file => file.path.replace('uploads/', '')) : [];
-    const product = await Product.findByIdAndUpdate(req.params.id, { ...req.body, images }, { new: true });
-    if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.json(product);
-  } catch (error) {
-    console.error('Error updating product:', error); // Log error details
-    res.status(500).json({ message: 'Failed to update product', error: error.message });
-  }
-});
-*/
-//gptcodetoprevent the oldimages
-router.put('/:id', upload.array('images', 5), async (req, res) => {
-  try {
-    // Get new images from the request
+    const { title, price, offer, disc, category } = req.body;
+
+    // Get new images from the request (if any)
     const newImages = req.files ? req.files.map(file => file.path.replace('uploads/', '')) : [];
-    
+
     // Find the existing product
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    // Combine existing images with new images
-    const updatedImages = [...product.images, ...newImages];
+    // Combine existing images with new images (only add new images if provided)
+    const updatedImages = newImages.length > 0 ? [...product.images, ...newImages] : product.images;
 
     // Update the product with the combined images
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, { ...req.body, images: updatedImages }, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, { title, price, offer, disc, category, images: updatedImages }, { new: true });
 
     res.json(updatedProduct);
   } catch (error) {
-    console.error('Error updating product:', error); // Log error details
+    console.error('Error updating product:', error);
     res.status(500).json({ message: 'Failed to update product', error: error.message });
   }
 });
@@ -99,7 +88,7 @@ router.delete('/:id', async (req, res) => {
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.status(204).end();
   } catch (error) {
-    console.error('Error deleting product:', error); // Log error details
+    console.error('Error deleting product:', error);
     res.status(500).json({ message: 'Failed to delete product', error: error.message });
   }
 });

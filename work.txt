@@ -331,3 +331,265 @@ function SingleProductPage() {
 }
 
 export default SingleProductPage;
+
+
+//with payment with image
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import { load } from '@cashfreepayments/cashfree-js';
+import { useCart } from '../contexts/CartContext';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import {jwtDecode} from 'jwt-decode';  // Correct import for jwt-decode
+
+function SingleProduct() {
+  const [product, setProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState('');
+  const { id } = useParams();
+  const { addToCart, cart } = useCart();
+  const [user, setUser] = useState(null);  // To store user details
+
+  // Function to fetch user from token
+  const getUserFromToken = () => {
+    const token = localStorage.getItem('token');  // Assuming the token is stored in localStorage
+    if (token) {
+      try {
+        const decoded = jwtDecode(token); // Decode the JWT token
+        return decoded.id;  // Return user ID from decoded token
+      } catch (error) {
+        console.error('Invalid or expired token:', error);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  // Fetch user details when the component mounts
+  useEffect(() => {
+    const userId = getUserFromToken();
+    if (userId) {
+      // Fetch the user details from the backend using the decoded `id`
+      const token = localStorage.getItem('token');
+      axios.get('http://localhost:5000/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token}` // Pass token in the Authorization header
+        }
+      })
+        .then(response => {
+          setUser(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching user details:', error);
+        });
+    } else {
+      console.log("User not logged in or invalid token");
+    }
+  }, []);
+
+  // Fetch product details
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/products/${id}`);
+        setProduct(response.data);
+        if (response.data.images && response.data.images.length > 0) {
+          setSelectedImage(response.data.images[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  // Handle payment initiation
+  const handlePayment = async () => {
+    if (!product || !user) {
+      console.error("Product or user data is missing");
+      alert('Please Login First!')
+      return;
+    }
+
+    const paymentData = {
+      orderAmount: product.price,
+      customerDetails: {
+        customer_id: user._id,
+        customer_phone: user.phone || '9999999999',
+        customer_name: user.name,
+        customer_email: user.email,
+      },
+    };
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/payment/initiate', paymentData);
+      const { payment_session_id } = response.data;
+
+      if (payment_session_id) {
+        const cashfree = await load({ mode: 'sandbox' });
+        cashfree.checkout({
+          paymentSessionId: payment_session_id,
+          redirectTarget: '_modal',
+        }).then((res) => {
+          console.log('Payment initialized', res);
+        }).catch(err => {
+          console.error('Error during checkout:', err);
+        });
+      }
+    } catch (error) {
+      console.error('Payment initiation error:', error);
+    }
+  };
+
+  // Handle adding to the cart
+  const handleAddToCart = () => {
+    if (product) {
+      const productToAdd = {
+        id: product._id,
+        title: product.title,
+        price: product.price,
+        images: product.images,
+      };
+
+      const isProductInCart = cart.some(item => item.id === productToAdd.id);
+
+      if (isProductInCart) {
+        alert(`${product.title} is already in your cart!`);
+      } else {
+        addToCart(productToAdd);
+        alert(`${product.title} has been added to your cart!`);
+      }
+    }
+  };
+
+  // If product is not yet fetched, show loading
+  if (!product) return <div>Loading...</div>;
+
+  return (
+    <div>
+      <Navbar />
+      <div className='lg:flex lg:flex-row mt-10 sm:flex sm:flex-col'>
+        <div className="lg:flex lg:flex-row sm:flex sm:flex-col-reverse">
+          <div className="lg:flex lg:flex-col gap-2 space-y-5 mr-7 mt-10 sm:flex sm:flex-row sm:overflow-x-scroll lg:overflow-hidden">
+            {product.images.map((image, index) => (
+              <img
+                key={index}
+                src={`http://localhost:5000/${image}`}
+                alt="Product"
+                className="w-14 h-14 border rounded-lg cursor-pointer"
+                onClick={() => setSelectedImage(image)}
+              />
+            ))}
+          </div>
+          <div>
+            <img src={`http://localhost:5000/${selectedImage}`} alt="Product" className="h-96 w-96 border-2 border-gray-200" />
+          </div>
+        </div>
+        <div className='flex flex-col ml-4 mt-7'>
+          <hr/>
+          <h1 className='text-3xl'>{product.title}</h1>
+          <p className='mt-3'>{product.disc}</p>
+          <hr/>
+          <p className='text-xl mt-5'>Price: ₹{product.price}</p>
+          <p className='text-xl mt-5 text-red-600'>{product.offer}%</p>
+          <hr/>
+          <button className='bg-yellow-400 px-5 py-3 rounded-xl mt-4' onClick={handleAddToCart}>Add to Cart</button>
+          <button className='bg-blue-400 px-5 py-3 rounded-xl mt-4' onClick={handlePayment}>Buy Now</button>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default SingleProduct;
+
+//category wise products
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import { useCart } from '../contexts/CartContext';
+
+function ProductDetails() {
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const { addToCart } = useCart();
+
+  // Fetch all products and categories on mount
+  useEffect(() => {
+    const fetchProductsAndCategories = async () => {
+      try {
+        // Fetch all products
+        const productResponse = await axios.get('http://localhost:5000/api/products');
+        setProducts(productResponse.data);
+        setFilteredProducts(productResponse.data); // Initially, all products are displayed
+
+        // Fetch categories
+        const categoryResponse = await axios.get('http://localhost:5000/api/categories');
+        setCategories(categoryResponse.data); // Assuming category data contains title and id
+      } catch (error) {
+        console.error('Error fetching products or categories:', error);
+      }
+    };
+
+    fetchProductsAndCategories();
+  }, []);
+
+  // Handle category change
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    if (category) {
+      // Filter products by selected category
+      const filtered = products.filter(product => product.category === category);
+      setFilteredProducts(filtered);
+    } else {
+      // Show all products if no category is selected
+      setFilteredProducts(products);
+    }
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <div className="container mx-auto mt-10">
+        <h1 className="text-3xl font-semibold">Products</h1>
+
+        <div className="mt-5">
+          <h2 className="text-xl">Filter by Category:</h2>
+          <select 
+            value={selectedCategory} 
+            onChange={(e) => handleCategoryChange(e.target.value)} 
+            className="border p-2 rounded mt-2"
+          >
+            <option value="">All Categories</option>
+            {products.map(product => (
+              <option key={product._id} value={product.category}>{product.category}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-5">
+          {filteredProducts.map(product => (
+            <div key={product._id} className="border rounded-lg p-4">
+              <img src={`http://localhost:5000/${product.images[0]}`} alt={product.title} className="h-32 w-full object-cover" />
+              <h3 className="text-lg mt-2">{product.title}</h3>
+              <p className="text-xl mt-1">₹{product.price}</p>
+              <button className="bg-yellow-400 px-3 py-2 mt-2 rounded" onClick={() => addToCart({ id: product._id, title: product.title, price: product.price, images: product.images })}>
+                Add to Cart
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default ProductDetails;
