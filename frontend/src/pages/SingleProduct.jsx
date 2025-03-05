@@ -47,7 +47,7 @@ function SingleProduct() {
     if (userId) {
       const token = localStorage.getItem("token");
       axios
-        .get("http://localhost:5000/api/auth/me", {
+        .get("https://rentdrope-1.onrender.com/api/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -68,14 +68,14 @@ function SingleProduct() {
     const fetchProductAndReviews = async () => {
       try {
         // Fetch product details
-        const productResponse = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const productResponse = await axios.get(`https://rentdrope-1.onrender.com/api/products/${id}`);
         setProduct(productResponse.data);
         if (productResponse.data.images && productResponse.data.images.length > 0) {
           setSelectedImage(productResponse.data.images[0]);
         }
 
         // Fetch reviews for this product
-        const reviewsResponse = await axios.get(`http://localhost:5000/api/reviews/products/${id}`);
+        const reviewsResponse = await axios.get(`https://rentdrope-1.onrender.com/api/reviews/products/${id}`);
         setReviews(reviewsResponse.data);
       } catch (error) {
         console.error("Error fetching product or reviews:", error);
@@ -104,7 +104,7 @@ function SingleProduct() {
     };
 
     try {
-      const response = await axios.post("http://localhost:5000/api/payment/initiate", paymentData);
+      const response = await axios.post("https://rentdrope-1.onrender.com/api/payment/initiate", paymentData);
       const { payment_session_id } = response.data;
 
       if (payment_session_id) {
@@ -118,7 +118,7 @@ function SingleProduct() {
             console.log("Payment initialized", res);
 
             // Notify backend to send emails
-            await axios.post("http://localhost:5000/api/payment/success", {
+            await axios.post("https://rentdrope-1.onrender.com/api/payment/success", {
               paymentData,
               productId: product._id,
             });
@@ -192,7 +192,7 @@ function SingleProduct() {
             {product.images.map((image, index) => (
               <img
                 key={index}
-                src={`http://localhost:5000/${image}`}
+                src={`https://rentdrope-1.onrender.com/${image}`}
                 alt="Product"
                 className="w-16 h-16 border rounded-lg cursor-pointer"
                 onClick={() => setSelectedImage(image)}
@@ -207,7 +207,7 @@ function SingleProduct() {
               {favorites.includes(product._id) ? "❤️" : "🤍"}
             </button>
             <img
-              src={`http://localhost:5000/${selectedImage}`}
+              src={`https://rentdrope-1.onrender.com/${selectedImage}`}
               alt="Product"
               className="h-[300px] w-full sm:w-full lg:h-[500px] lg:w-[700px] border-2 mb-6"
             />
