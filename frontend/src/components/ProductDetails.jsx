@@ -16,7 +16,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchProductsAndCategories = async () => {
       try {
-        const productResponse = await axios.get('http://localhost:5000/api/products');
+        const productResponse = await axios.get('https://rentdrope-1.onrender.com/api/products');
         setProducts(productResponse.data);
         setFilteredProducts(productResponse.data);
 
@@ -65,7 +65,7 @@ function ProductDetails() {
           {filteredProducts.map(product => (
             <Link to={`/products/${product._id}`} key={product._id}>
             <div key={product._id} className="border rounded-lg shadow-lg p-4 transition-transform transform hover:scale-105">
-              <img src={`http://localhost:5000/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded-md" />
+              <img src={`https://rentdrope-1.onrender.com/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded-md" />
               <h3 className="text-xl font-semibold mt-3">{product.title}</h3>
               <p className="text-lg text-gray-600 mt-1">₹{product.price}</p>
               <p className="text-lg text-red-600 mt-1">{product.offer}%</p>
