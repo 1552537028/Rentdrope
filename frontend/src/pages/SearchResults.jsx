@@ -16,7 +16,7 @@ const SearchResults = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get('https://rentdrope-1.onrender.com/api/products');
         setProducts(response.data);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -48,7 +48,7 @@ const SearchResults = () => {
             <Link to={`/products/${product._id}`} key={product._id}>
               <div className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <img
-                  src={`http://localhost:5000/${product.images[0]}`}
+                  src={`https://rentdrope-1.onrender.com/${product.images[0]}`}
                   alt={product.title}
                   className="w-full h-52 object-cover"
                 />
