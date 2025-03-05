@@ -19,7 +19,7 @@ const User = require("./models/User");
 
 // App setup
 const app = express();
-const PORT = "https://rentdrope-1.onrender.com";
+const PORT = process.env.PORT || 5000;
 
 // Serve static files (images)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -39,7 +39,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Middleware
 app.use(
   cors({
-    origin: "https://rentdrope.onrender.com", // React app's origin
+    origin: "https://rentdrope.onrender.com", // Replace with your frontend URL
   })
 );
 app.use(bodyParser.json());
@@ -71,7 +71,7 @@ Your Company Name`,
 
     html: `<p>Dear User,</p>
            <p>Your payment of <strong>₹${orderAmount}</strong> for the product <strong>"${productTitle}"</strong> has been successfully processed.</p>
-           <image>"${selectedImage}</image>
+           <img src="${selectedImage}" alt="Product Image"/>
            <p>Thank you for your purchase!</p>
            <p>Best regards,</p>
            <p>Your Company Name</p>`,
@@ -129,7 +129,7 @@ app.post("/api/payment/success", async (req, res) => {
     console.log("Sending email to admin:", adminEmail);
 
     // Send email to both user and admin
-    await sendEmail(user.email, adminEmail, product.title, paymentData.orderAmount);
+    await sendEmail(user.email, adminEmail, product.title, paymentData.orderAmount, product.selectedImage);
 
     console.log("Emails sent successfully");
     res.status(200).send("Payment successful, emails sent!");
@@ -143,3 +143,4 @@ app.post("/api/payment/success", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
