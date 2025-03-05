@@ -15,7 +15,7 @@ function ProductPage() {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
-  const API_URL = 'http://localhost:5000'; // Change with your actual API URL
+  const API_URL = 'https://rentdrope-1.onrender.com'; // Change with your actual API URL
 
   useEffect(() => {
     // Fetch products on component mount
