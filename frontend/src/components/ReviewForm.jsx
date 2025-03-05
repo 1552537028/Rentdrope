@@ -27,7 +27,7 @@ const ReviewForm = ({ productId, onAddReview, setShowReviewForm }) => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/reviews/products/${productId}`, newReview);
+      const response = await axios.post(`https://rentdrope-1.onrender.com/api/reviews/products/${productId}`, newReview);
       onAddReview(response.data); // Add the new review to the list
       setNewReview({ rating: 0, comment: "", customerName: "" }); // Clear the form
       setShowReviewForm(false); // Hide the form
