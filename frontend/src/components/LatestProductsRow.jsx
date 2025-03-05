@@ -17,7 +17,7 @@ const LatestProductsRow = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get('https://rentdrope-1.onrender.com/api/products');
         setProducts(response.data);
         setFilteredProducts(response.data);
       } catch (error) {
@@ -70,7 +70,7 @@ const LatestProductsRow = () => {
               <Link to={`/products/${product._id}`} key={product._id}>
                 <div className="relative border rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 bg-white w-60 sm:w-72 lg:w-80">
                   <img
-                    src={`http://localhost:5000/${product.images[0]}`}
+                    src={`https://rentdrope-1.onrender.com/${product.images[0]}`}
                     alt={product.title}
                     className="h-48 w-full object-cover"
                   />
