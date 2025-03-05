@@ -19,7 +19,7 @@ const User = require("./models/User");
 
 // App setup
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = "https://rentdrope-1.onrender.com";
 
 // Serve static files (images)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -39,7 +39,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // React app's origin
+    origin: "https://rentdrope.onrender.com", // React app's origin
   })
 );
 app.use(bodyParser.json());
@@ -55,7 +55,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Function to send email to both the user and admin
-const sendEmail = async (userEmail, adminEmail, productTitle, orderAmount) => {
+const sendEmail = async (userEmail, adminEmail, productTitle, orderAmount, selectedImage) => {
   const mailOptions = {
     from: process.env.EMAIL_USER, // Your email address
     to: `${userEmail}, ${adminEmail}`, // Send to both user and admin
@@ -71,6 +71,7 @@ Your Company Name`,
 
     html: `<p>Dear User,</p>
            <p>Your payment of <strong>₹${orderAmount}</strong> for the product <strong>"${productTitle}"</strong> has been successfully processed.</p>
+           <image>"${selectedImage}</image>
            <p>Thank you for your purchase!</p>
            <p>Best regards,</p>
            <p>Your Company Name</p>`,
