@@ -19,7 +19,7 @@ const ProductList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get('https://rentdrope-1.onrender.com/api/products');
         setProducts(response.data);
         setFilteredProducts(response.data);
       } catch (error) {
@@ -73,7 +73,7 @@ const ProductList = () => {
               <Link to={`/products/${product._id}`} key={product._id}>
                 <div className="relative border rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 bg-white w-60 sm:w-72 lg:w-80">
                   <img
-                    src={`http://localhost:5000/${product.images[0]}`}
+                    src={`https://rentdrope-1.onrender.com/${product.images[0]}`}
                     alt={product.title}
                     className="h-48 w-full object-cover"
                   />
@@ -108,89 +108,3 @@ const ProductList = () => {
 };
 
 export default ProductList;
-
-
-
-
-
-
-/*import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { useCart } from '../contexts/CartContext';
-
-const ProductList = () => {
-  const { term } = useParams();
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const { addToCart } = useCart();
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/products');
-        setProducts(response.data);
-        setFilteredProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    const applySearchFilter = () => {
-      if (term) {
-        const updatedProducts = products.filter(product =>
-          product.title.toLowerCase().includes(term.toLowerCase())
-        );
-        setFilteredProducts(updatedProducts);
-      } else {
-        setFilteredProducts(products);
-      }
-    };
-
-    applySearchFilter();
-  }, [term, products]);
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <div className="lg:mx-auto lg:container sm:mx-2 mt-10 ">
-        <h1 className="text-4xl font-semibold text-center mb-6">Products List</h1>
-
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:gap-4 sm:gap-2 mt-5">
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map(product => (
-              <Link to={`/products/${product._id}`} key={product._id}>
-                <div className="border rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 bg-white lg:w-full sm:w-48">
-                  <img
-                    src={`http://localhost:5000/${product.images[0]}`}
-                    alt={product.title}
-                    className="h-48 w-full object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-xl font-semibold overflow-hidden overflow-ellipsis whitespace-nowrap" style={{ maxHeight: '2.5em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                      {product.title}
-                    </h3>
-                    <p className="text-lg text-gray-600">₹{product.price}</p>
-                    <p className="text-lg text-red-600">{product.offer}%</p>
-                  </div>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="text-center text-gray-600">No products found.</p>
-          )}
-        </div>
-      </div>
-      <Footer />
-    </div>
-  );
-};
-
-export default ProductList;
-*/
