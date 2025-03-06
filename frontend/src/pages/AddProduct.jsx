@@ -51,7 +51,7 @@ function ProductPage() {
             'Content-Type': 'multipart/form-data',
           },
         })
-      : axios.post(`${API_URL}/api/products`, formData, {
+      : axios.post('https://rentdrope-1.onrender.com/api/products', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
