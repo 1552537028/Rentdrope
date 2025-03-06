@@ -5,9 +5,9 @@ function ProductPage() {
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [offer, setOffer] = useState('');
-  const [disc, setDisc] = useState(''); // Description field
+  const [disc, setDisc] = useState('');
   const [category, setCategory] = useState('');
-  const [email, setEmail] = useState(''); // Email field
+  const [email, setEmail] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
   const [products, setProducts] = useState([]);
@@ -15,9 +15,11 @@ function ProductPage() {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
+  const API_URL = 'https://rentdrope-1.onrender.com'; // Updated backend URL
+
   useEffect(() => {
     // Fetch products on component mount
-    axios.get('https://rentdrope-1.onrender.com/api/products')
+    axios.get(`${API_URL}/api/products`)
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
@@ -38,20 +40,20 @@ function ProductPage() {
     formData.append('title', title);
     formData.append('price', price);
     formData.append('offer', offer);
-    formData.append('disc', disc);  // Ensure 'disc' (description) is added here
+    formData.append('disc', disc); 
     formData.append('category', category);
-    formData.append('email', email);  // Email field added here
+    formData.append('email', email); 
     selectedImages.forEach(image => {
       formData.append('images', image);
     });
 
     const request = editingProductId
-      ? axios.put('https://rentdrope-1.onrender.com/api/products/${editingProductId}', formData, {
+      ? axios.put(`${API_URL}/api/products/${editingProductId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
-      : axios.post('https://rentdrope-1.onrender.com/api/products', formData, {
+      : axios.post(`${API_URL}/api/products`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -83,17 +85,17 @@ function ProductPage() {
     setTitle(product.title);
     setPrice(product.price);
     setOffer(product.offer);
-    setDisc(product.disc);  // Set the 'disc' (description) value for editing
+    setDisc(product.disc);
     setCategory(product.category);
-    setEmail(product.email); // Set email value for editing
+    setEmail(product.email); 
     setSelectedImages([]); 
     setPreviewImages([]); 
     setEditingProductId(product._id);
-    setShowAllProducts(false); // Switch to form view
+    setShowAllProducts(false);
   };
 
   const handleDelete = (id) => {
-    axios.delete('https://rentdrope-1.onrender.com/api/products/${id}')
+    axios.delete(`${API_URL}/api/products/${id}`)
       .then(() => {
         setProducts(products.filter(product => product._id !== id));
         setUploadStatus('Product deleted successfully!');
@@ -169,12 +171,12 @@ function ProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map(product => (
               <div key={product._id} className="bg-white shadow-md rounded p-4">
-                <img src={'https://rentdrope-1.onrender.com}/${product.images[0]}'} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
+                <img src={`${API_URL}/uploads/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
                 <h2 className="text-lg font-bold">{product.title}</h2>
                 <p className="text-gray-700">${product.price}</p>
                 {product.offer > 0 && <p className="text-red-500">Offer: {product.offer}%</p>}
                 <p className="text-gray-500">Category: {product.category}</p>
-                <p className="text-gray-500">Email: {product.email}</p> {/* Show email */}
+                <p className="text-gray-500">Email: {product.email}</p>
                 <div className="flex justify-between mt-4">
                   <button 
                     onClick={() => handleEdit(product)} 
@@ -199,3 +201,4 @@ function ProductPage() {
 }
 
 export default ProductPage;
+
