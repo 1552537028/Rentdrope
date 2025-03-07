@@ -26,7 +26,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect("mongodb+srv://jayanth:jayanth@cluster0.ubyck.mongodb.net/rentdrope", { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -53,9 +53,8 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS, // Your email password or app password (from environment variable)
   },
 });
-
 // Function to send email to both the user and admin
-const sendEmail = async (userEmail, adminEmail, productTitle, orderAmount) => {
+const sendEmail = async (userEmail, adminEmail, productTitle, orderAmount, selectedImage) => {
   const mailOptions = {
     from: process.env.EMAIL_USER, // Your email address
     to: `${userEmail}, ${adminEmail}`, // Send to both user and admin
@@ -71,6 +70,7 @@ Your Company Name`,
 
     html: `<p>Dear User,</p>
            <p>Your payment of <strong>₹${orderAmount}</strong> for the product <strong>"${productTitle}"</strong> has been successfully processed.</p>
+           <img>"${selectedImage}</img>
            <p>Thank you for your purchase!</p>
            <p>Best regards,</p>
            <p>Your Company Name</p>`,
