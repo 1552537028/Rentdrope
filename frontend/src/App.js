@@ -5,7 +5,7 @@ import { CartProvider } from './contexts/CartContext';
 import Cart from './pages/Cart';
 import SingleProductPage from './pages/SingleProduct';
 import ProductList from './pages/ProductList';
-//import ProductPage from './pages/AddProduct';
+import ProductPage from './pages/AddProduct';
 import HomePage from './pages/HomePage';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -22,7 +22,7 @@ function App() {
                     <Route path='/cart' element={<Cart/>}/>
                     <Route path="/products/:id" element={<SingleProductPage />} />
                     <Route path="/products" element={<ProductList />} />
-                    <Route path='/admin' element={<HomePage/>}/>
+                    <Route path='/admin' element={<ProductPage/>}/>
                     <Route path='/' element={<HomePage/>}/>
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/login" element={<Login />} />
