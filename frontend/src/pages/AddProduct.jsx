@@ -5,8 +5,9 @@ function ProductPage() {
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [offer, setOffer] = useState('');
-  const [disc, setDisc] = useState('');
+  const [disc, setDisc] = useState(''); // Description field
   const [category, setCategory] = useState('');
+  const [email, setEmail] = useState(''); // Email field
   const [selectedImages, setSelectedImages] = useState([]);
   const [previewImages, setPreviewImages] = useState([]);
   const [products, setProducts] = useState([]);
@@ -14,12 +15,9 @@ function ProductPage() {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
-  
-  const API_URL = 'https://rentdrope-1.onrender.com'; 
-
   useEffect(() => {
     // Fetch products on component mount
-    axios.get(`${API_URL}/api/products`)
+    axios.get(`https://rentdrope-1.onrender.com/api/products`)
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
@@ -40,22 +38,23 @@ function ProductPage() {
     formData.append('title', title);
     formData.append('price', price);
     formData.append('offer', offer);
-    formData.append('disc', disc);
+    formData.append('disc', disc);  // Ensure 'disc' (description) is added here
     formData.append('category', category);
+    formData.append('email', email);  // Email field added here
     selectedImages.forEach(image => {
       formData.append('images', image);
     });
 
     const request = editingProductId
-      ? axios.put(`${API_URL}/api/products/${editingProductId}`, formData, {
+      ? axios.put(`https://rentdrope-1.onrender.com/api/products/${editingProductId}`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         })
-      : axios.post(`${API_URL}/api/products`, formData, {
+      : axios.post(`https://rentdrope-1.onrender.com/api/products`, formData, {
           headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'multipart/form-data',
+          },
         });
 
     request
@@ -75,6 +74,7 @@ function ProductPage() {
         setUploadStatus('Failed to upload product.');
       });
   };
+
   const toggleView = () => {
     setShowAllProducts(!showAllProducts);
   };
@@ -83,16 +83,17 @@ function ProductPage() {
     setTitle(product.title);
     setPrice(product.price);
     setOffer(product.offer);
-    setDisc(product.disc);
+    setDisc(product.disc);  // Set the 'disc' (description) value for editing
     setCategory(product.category);
-    setSelectedImages([]);
+    setEmail(product.email); // Set email value for editing
+    setSelectedImages([]); 
     setPreviewImages([]); 
     setEditingProductId(product._id);
     setShowAllProducts(false); // Switch to form view
   };
 
   const handleDelete = (id) => {
-    axios.delete(`${API_URL}/api/products/${id}`)
+    axios.delete(`https://rentdrope-1.onrender.com/api/products/${id}`)
       .then(() => {
         setProducts(products.filter(product => product._id !== id));
         setUploadStatus('Product deleted successfully!');
@@ -137,6 +138,10 @@ function ProductPage() {
             <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
           </label>
           <label className="block mb-2">
+            Email:
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
+          </label>
+          <label className="block mb-2">
             Select Images:
             <input type="file" multiple accept="image/*" onChange={handleImageChange} className="mt-1 block w-full border rounded p-2"/>
           </label>
@@ -164,11 +169,12 @@ function ProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map(product => (
               <div key={product._id} className="bg-white shadow-md rounded p-4">
-                <img src={`${API_URL}/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
+                <img src={`https://rentdrope-1.onrender.com/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
                 <h2 className="text-lg font-bold">{product.title}</h2>
                 <p className="text-gray-700">${product.price}</p>
                 {product.offer > 0 && <p className="text-red-500">Offer: {product.offer}%</p>}
                 <p className="text-gray-500">Category: {product.category}</p>
+                <p className="text-gray-500">Email: {product.email}</p> {/* Show email */}
                 <div className="flex justify-between mt-4">
                   <button 
                     onClick={() => handleEdit(product)} 
@@ -193,3 +199,4 @@ function ProductPage() {
 }
 
 export default ProductPage;
+
