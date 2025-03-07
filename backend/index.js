@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors(origin:"rentdrope.onrender.com"));
+app.use(cors({origin:"rentdrope.onrender.com"}));
 app.use(bodyParser.json());
 
 // Serve static files (images) from the 'uploads' directory
