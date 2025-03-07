@@ -15,9 +15,11 @@ function ProductPage() {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
+  const API_URL = 'https://rentdrope-1.onrender.com'; // Use the deployed URL
+
   useEffect(() => {
     // Fetch products on component mount
-    axios.get(`https://rentdrope-1.onrender.com/api/products`)
+    axios.get(`${API_URL}/api/products`)
       .then(response => setProducts(response.data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
@@ -46,12 +48,12 @@ function ProductPage() {
     });
 
     const request = editingProductId
-      ? axios.put(`https://rentdrope-1.onrender.com/api/products/${editingProductId}`, formData, {
+      ? axios.put(`${API_URL}/api/products/${editingProductId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
-      : axios.post(`https://rentdrope-1.onrender.com/api/products`, formData, {
+      : axios.post(`${API_URL}/api/products`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -93,7 +95,7 @@ function ProductPage() {
   };
 
   const handleDelete = (id) => {
-    axios.delete(`https://rentdrope-1.onrender.com/api/products/${id}`)
+    axios.delete(`${API_URL}/api/products/${id}`)
       .then(() => {
         setProducts(products.filter(product => product._id !== id));
         setUploadStatus('Product deleted successfully!');
@@ -169,7 +171,8 @@ function ProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map(product => (
               <div key={product._id} className="bg-white shadow-md rounded p-4">
-                <img src={`https://rentdrope-1.onrender.com/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
+                {/* Use the deployed image URL */}
+                <img src={`${API_URL}/uploads/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
                 <h2 className="text-lg font-bold">{product.title}</h2>
                 <p className="text-gray-700">${product.price}</p>
                 {product.offer > 0 && <p className="text-red-500">Offer: {product.offer}%</p>}
@@ -199,4 +202,5 @@ function ProductPage() {
 }
 
 export default ProductPage;
+
 
