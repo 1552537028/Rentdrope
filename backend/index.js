@@ -16,7 +16,7 @@ const reviewRoutes = require('./routes/reviews');
 // Models
 const Product = require('./models/Product');
 const User = require('./models/User');
-
+const Reviews = require('./models/Review');
 // Initialize the Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
