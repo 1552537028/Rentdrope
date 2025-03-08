@@ -17,7 +17,8 @@ const storage = multer.diskStorage({
     cb(null, uploadsDir);  // Store files in the 'uploads' directory
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));  // Append timestamp to filenames to avoid conflicts
+    // Append timestamp to filenames to avoid conflicts
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -30,13 +31,14 @@ router.post('/', upload.array('images', 8), async (req, res) => {
       return res.status(400).json({ message: 'No files uploaded.' });
     }
 
-    // Map the uploaded files to an array of file paths (removing the 'uploads/' prefix)
-    const images = req.files.map(file => file.path.replace('uploads/', ''));
-    
+    // Map the uploaded files to an array of file names (without 'uploads/' prefix)
+    const images = req.files.map(file => path.basename(file.path));  // Only get the file name
+
     // Create and save the new product with the images
     const product = new Product({ ...req.body, images });
     await product.save();
 
+    // Respond with the created product
     res.status(201).json(product);
   } catch (error) {
     console.error('Error adding product:', error);
@@ -73,7 +75,7 @@ router.put('/:id', upload.array('images', 5), async (req, res) => {
     const { title, price, offer, disc, category } = req.body;
 
     // Get new images (if any)
-    const newImages = req.files ? req.files.map(file => file.path.replace('uploads/', '')) : [];
+    const newImages = req.files ? req.files.map(file => path.basename(file.path)) : [];
 
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -106,4 +108,5 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
 
