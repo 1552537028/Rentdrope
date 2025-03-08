@@ -17,9 +17,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Helper function to format image URLs
+// Helper function to format image URLs
 const formatImageUrls = (images) => {
-  return images.map(image => `/uploads/${image}`);
+  return images.map(image => {
+    // Ensure no double slashes by handling the leading 'uploads/'
+    return `/uploads/${image.replace(/^uploads\//, '')}`;
+  });
 };
+
 
 // Create a new product with images
 router.post('/', upload.array('images', 8), async (req, res) => {
