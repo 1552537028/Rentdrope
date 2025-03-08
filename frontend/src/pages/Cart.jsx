@@ -84,7 +84,7 @@ const Cart = () => {
                   <Link to={`/products/${item.id}`} className="text-xl">
                     <div className='flex flex-row'>
                       <img
-                        src={`https://rentdrope-1.onrender.com/${item.images[0]}`}
+                        src={`https://rentdrope-1.onrender.com/uploads/${item.images[0]}`}
                         alt={item.title}
                         className="w-16 h-16 mr-4"
                       />
