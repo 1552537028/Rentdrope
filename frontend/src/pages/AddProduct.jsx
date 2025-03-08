@@ -121,27 +121,27 @@ function ProductPage() {
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded p-4 sm:w-screen lg:w-full">
           <label className="block mb-2">
             Title:
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="mt-1 block w-full border rounded p-2"placeholder='enter product name'/>
           </label>
           <label className="block mb-2">
             Price:
-            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required className="mt-1 block w-full border rounded p-2"placeholder='rent/day'/>
           </label>
           <label className="block mb-2">
             Offer (%):
-            <input type="number" value={offer} onChange={(e) => setOffer(e.target.value)} className="mt-1 block w-full border rounded p-2"/>
+            <input type="number" value={offer} onChange={(e) => setOffer(e.target.value)} className="mt-1 block w-full border rounded p-2"placeholder='offer in %,e.g.10'/>
           </label>
           <label className="block mb-2">
             Description:
-            <textarea value={disc} onChange={(e) => setDisc(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
+            <textarea value={disc} onChange={(e) => setDisc(e.target.value)} required className="mt-1 block w-full border rounded p-2"placeholder='product details'/>
           </label>
           <label className="block mb-2">
             Category:
-            <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
+            <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required className="mt-1 block w-full border rounded p-2"placeholder='e.g.men or women or kids'/>
           </label>
           <label className="block mb-2">
             Email:
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1 block w-full border rounded p-2"placeholder='enter a valid email to notify you'/>
           </label>
           <label className="block mb-2">
             Select Images:
