@@ -180,7 +180,6 @@ const LatestProducts = () => {
       <div className="lg:mx-auto lg:container mt-10">
         <h1 className="text-4xl font-semibold text-center text-red-600 mb-6">Latest Products</h1>
 
-        {/* Horizontal scrollable container with fixed width for product cards */}
         <div className="sm:flex sm:flex-wrap sm:justify-start sm:gap-4 overflow-y-hidden">
           {filteredProducts.slice(0, 8).length > 0 ? (
             filteredProducts.slice(0, 8).map((product) => (
@@ -217,7 +216,6 @@ const LatestProducts = () => {
         </div>
       </div>
 
-      {/* Button to see all products */}
       <div className="flex justify-center items-center mt-8">
         <button onClick={AllProducts} className="p-3 bg-orange-600 text-white rounded-full shadow-md hover:bg-orange-700 transition-all">
           See All Products
