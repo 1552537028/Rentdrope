@@ -172,7 +172,6 @@ const LatestProductsRow = () => {
       <div className="lg:mx-auto lg:container mt-10">
         <h1 className="text-4xl font-semibold text-center text-red-600 mb-6">Featured Products</h1>
 
-        {/* Horizontal scrollable container */}
         <div className="flex overflow-x-auto space-x-5 py-4 lg:mt-5">
           {filteredProducts.slice(0, 8).length > 0 ? (
             filteredProducts.slice(0, 8).map((product) => (
