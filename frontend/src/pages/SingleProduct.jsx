@@ -207,7 +207,7 @@ function SingleProduct() {
               {favorites.includes(product._id) ? "❤️" : "🤍"}
             </button>
             <img
-              src={`https://rentdrope-1.onrender.com/${selectedImage}`}
+              src={`https://rentdrope-1.onrender.com/uploads/${selectedImage}`}
               alt="Product"
               className="h-[300px] w-[400px] sm:h-[500px] sm:w-[100vw] border-2 border-gray-200 object-cover"
             />
