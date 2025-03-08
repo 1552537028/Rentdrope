@@ -48,7 +48,7 @@ const FavoritesPage = () => {
               <Link to={`/products/${product._id}`} key={product._id}>
                 <div className="border rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 bg-white lg:w-full sm:w-36 relative">
                   <img
-                    src={`https://rentdrope-1.onrender.com/${product.images[0]}`}
+                    src={`https://rentdrope-1.onrender.com/uploads/${product.images[0]}`}
                     alt={product.title}
                     className="h-48 w-full object-cover"
                   />
