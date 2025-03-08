@@ -15,7 +15,7 @@ function ProductPage() {
   const [showAllProducts, setShowAllProducts] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
 
-  const API_URL = 'https://rentdrope-1.onrender.com'; // Use the deployed URL
+  const API_URL = 'http://rentdrope-1.onrender.com'; // Change with your actual API URL
 
   useEffect(() => {
     // Fetch products on component mount
@@ -118,7 +118,7 @@ function ProductPage() {
       </div>
 
       {!showAllProducts ? (
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded p-4">
+        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded p-4 sm:w-screen lg:w-full">
           <label className="block mb-2">
             Title:
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="mt-1 block w-full border rounded p-2"/>
@@ -171,7 +171,6 @@ function ProductPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map(product => (
               <div key={product._id} className="bg-white shadow-md rounded p-4">
-                {/* Use the deployed image URL */}
                 <img src={`${API_URL}/uploads/${product.images[0]}`} alt={product.title} className="w-full h-48 object-cover rounded mb-2"/>
                 <h2 className="text-lg font-bold">{product.title}</h2>
                 <p className="text-gray-700">${product.price}</p>
