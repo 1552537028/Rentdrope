@@ -30,7 +30,7 @@ const Hero = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-40 lg:h-96 sm:h-60 md:h-screen rounded-3xl overflow-hidden"> {/* Added rounded-lg and overflow-hidden here */}
+        <div className="relative w-full h-40 lg:h-96 sm:h-40 md:h-screen rounded-3xl overflow-hidden"> {/* Added rounded-lg and overflow-hidden here */}
             <div 
                 className="absolute inset-0 bg-cover bg-center transition-all duration-1000" 
                 style={{ backgroundImage: sections[currentIndex].image }}
