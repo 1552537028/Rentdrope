@@ -48,7 +48,7 @@ const SearchResults = () => {
             <Link to={`/products/${product._id}`} key={product._id}>
               <div className="border rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200">
                 <img
-                  src={`https://rentdrope-1.onrender.com/${product.images[0]}`}
+                  src={`https://rentdrope-1.onrender.com/uploads/${product.images[0]}`}
                   alt={product.title}
                   className="w-full h-52 object-cover"
                 />
