@@ -11,11 +11,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({origin:"https://rentdrope.onrender.com"}));
+app.use(cors({ origin: "https://rentdrope.onrender.com" }));
 app.use(bodyParser.json());
+
 // Serve static files (images) from the 'uploads' directory
 const uploadsDir = path.join(__dirname, 'uploads');
-app.use('/uploads', express.static(uploadsDir));  // This allows access to uploaded images
+app.use('/uploads', express.static(uploadsDir)); // This allows access to uploaded images
 
 // MongoDB connection
 mongoose.connect('mongodb+srv://jayanth:jayanth@cluster0.ubyck.mongodb.net/rentdrope', {
@@ -34,5 +35,6 @@ app.use('/api/products', productRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
 
 
