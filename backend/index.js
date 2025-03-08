@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
@@ -143,10 +143,10 @@ app.post("/api/payment/success", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+*/
 
 
-
-/*const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const cors = require('cors');
@@ -183,5 +183,5 @@ app.use('/api/products', productRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-*/
+
 
