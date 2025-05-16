@@ -2,10 +2,10 @@ import * as React from "react";
 
 function Footer() {
   return (
-    <footer className="flex flex-col items-start self-stretch pt-7 pr-16 pb-16 pl-3.5 mt-3 w-full text-xs text-black bg-zinc-300">
+    <footer className="flex flex-col items-start self-stretch pt-7 pr-16 pb-16 pl-3.5 mt-3 w-full text-xs text-black bg-primary">
       <div className="flex flex-col md:flex-row md:justify-between w-full">
         <div className="mb-6 md:mb-0">
-          <h2 className="text-sm font-bold mb-3">RentDrope</h2>
+          <h2 className="text-sm font-bold mb-3">VJ Wears</h2>
           <p className="max-w-xs text-gray-600">
             Your one-stop destination for renting high-quality products for
             special occasions.
@@ -26,10 +26,10 @@ function Footer() {
               </li>
               <li>
                 <a
-                  href="/admin"
+                  href="#"
                   className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-sm"
                 >
-                  Work with Us
+                  something
                 </a>
               </li>
               <li>
@@ -110,6 +110,15 @@ function Footer() {
           &copy; {new Date().getFullYear()} RentDrope. All rights reserved.
         </p>
       </div>
+      <li>
+        <a
+          href="/admin"
+          className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-sm"
+        >
+          Admin
+        </a>
+      </li>
+      
     </footer>
   );
 }

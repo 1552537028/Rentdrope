@@ -122,12 +122,12 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-500">
         <div className="text-center bg-white p-6 rounded shadow-md w-96">
           <p className="mb-4 text-lg">Sorry, we don't find any account please login first</p>
           <button
             onClick={handleLoginRedirect}
-            className="bg-blue-500 text-white py-2 px-4 rounded shadow hover:bg-blue-600 transition duration-200"
+            className="bg-black text-white py-2 px-4 rounded shadow hover:bg-gray-600 transition duration-200"
           >
             Login
           </button>

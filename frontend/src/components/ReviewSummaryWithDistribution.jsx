@@ -21,7 +21,7 @@ const ReviewSummaryWithDistribution = ({ reviews, setShowReviewForm, showReviewF
         <h3 className="text-lg font-semibold">Customer Reviews</h3>
         <button
           onClick={() => setShowReviewForm(!showReviewForm)}
-          className="mt-2 sm:mt-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-2 sm:mt-0 bg-black text-white px-4 py-2 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-white"
         >
           {showReviewForm ? "Cancel" : "Write a Review"}
         </button>
