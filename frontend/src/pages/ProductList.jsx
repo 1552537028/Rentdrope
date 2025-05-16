@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
-import UpperNavbar from '../components/UpperNavbar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
+import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 
 const ProductList = () => {
   const { term } = useParams();
@@ -62,37 +64,43 @@ const ProductList = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <UpperNavbar/>
+      <Navbar/>
       <div className="lg:mx-auto lg:container mt-10">
-        <h1 className="text-4xl font-semibold text-center text-red-600 mb-6">Latest Products</h1>
+        <h1 className="text-4xl font-semibold text-center text-red-600 mb-6">Exclussive Collections</h1>
 
         {/* Horizontal scrollable container with fixed width for product cards */}
         <div className="sm:flex sm:flex-wrap sm:justify-start sm:gap-4 overflow-y-hidden">
         {filteredProducts.length > 0 ? (
             filteredProducts.map(product => (
               <Link to={`/products/${product._id}`} key={product._id}>
-                <div className="relative border rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 bg-white w-60 sm:w-72 lg:w-80">
+                <div className="relative border shadow-lg overflow-hidden transform transition-transform bg-white w-60 sm:w-72 lg:w-80">
                   <img
-                    src={`http://localhost:5000/${product.images[0]}`}
+                    src={product.imageUrls[0]}
                     alt={product.title}
                     className="h-48 w-full object-cover"
                   />
+                  <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                    {product.offer}% OFF
+                  </div>
                   <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      toggleFavorite(product._id);
-                    }}
-                    className="absolute top-0 right-0 p-3 text-white transition-all"
-                    style={{ fontSize: '24px' }}
-                  >
-                    {favorites.includes(product._id) ? '❤️' : '🤍'}
+                     onClick={(e) => {
+                       e.preventDefault();
+                       toggleFavorite(product._id);
+                     }}
+                     className="absolute top-2 right-2 z-10"
+                   >
+                     <FontAwesomeIcon
+                       icon={favorites.includes(product._id) ? solidHeart : regularHeart}
+                       className={`text-xl transition-colors duration-200 ${
+                         favorites.includes(product._id) ? 'text-red-500' : 'text-white'
+                       }`}
+                     />
                   </button>
-                  <div className="p-4">
-                    <h3 className="text-xl font-semibold text-gray-800 truncate" style={{ maxHeight: '2.5em' }}>
+                  <div className="p-4 bg-gray-900 text-white">
+                    <h3 className="text-xl font-semibold text-white truncate" style={{ maxHeight: '2.5em' }}>
                       {product.title}
                     </h3>
-                    <p className="text-lg text-gray-600 mt-2">₹{product.price}</p>
-                    <p className="text-lg text-red-600 mt-1">{product.offer}% OFF</p>
+                    <p className="text-lg text-white mt-2">₹{product.price}</p>
                   </div>
                 </div>
               </Link>

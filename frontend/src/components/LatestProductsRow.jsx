@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as regularHeart } from '@fortawesome/free-regular-svg-icons';
+import { faHeart as solidHeart } from '@fortawesome/free-solid-svg-icons';
 import Footer from './Footer';
 
 const LatestProductsRow = () => {
@@ -9,7 +12,6 @@ const LatestProductsRow = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const navigate = useNavigate();
 
-  // Favorite products stored in localStorage
   const [favorites, setFavorites] = useState(
     JSON.parse(localStorage.getItem('favorites')) || []
   );
@@ -29,18 +31,14 @@ const LatestProductsRow = () => {
   }, []);
 
   useEffect(() => {
-    const applySearchFilter = () => {
-      if (term) {
-        const updatedProducts = products.filter(product =>
-          product.title.toLowerCase().includes(term.toLowerCase())
-        );
-        setFilteredProducts(updatedProducts);
-      } else {
-        setFilteredProducts(products);
-      }
-    };
-
-    applySearchFilter();
+    if (term) {
+      const updatedProducts = products.filter(product =>
+        product.title.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredProducts(updatedProducts);
+    } else {
+      setFilteredProducts(products);
+    }
   }, [term, products]);
 
   const toggleFavorite = (productId) => {
@@ -54,48 +52,56 @@ const LatestProductsRow = () => {
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
   };
 
-  function AllProducts() {
-    navigate('/products');
-  }
-
   return (
-    <div className="flex flex-col">
-      <div className="lg:mx-auto lg:container mt-10">
-        <h1 className="text-4xl font-semibold text-center text-red-600 mb-6">Featured Products</h1>
+    <div className="flex flex-col bg-white text-black py-10">
+      <div className="lg:container lg:mx-auto px-4">
+        <h1 className="text-4xl font-semibold text-center text-black mb-8">Latest<span className='bg-black text-white '>Collections</span></h1>
 
-        {/* Horizontal scrollable container */}
-        <div className="flex overflow-x-auto space-x-5 py-4 lg:mt-5">
+        <div className="flex overflow-x-auto space-x-4 py-4 scrollbar-hide">
           {filteredProducts.slice(0, 8).length > 0 ? (
             filteredProducts.slice(0, 8).map((product) => (
-              <Link to={`/products/${product._id}`} key={product._id}>
-                <div className="relative border rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 bg-white w-60 sm:w-72 lg:w-80">
+              <Link to={`/products/${product._id}`} key={product._id} className="shrink-0">
+                <div className="relative border border-gray-700 bg-gray-900  w-60 sm:w-64 lg:w-72 shadow-lg ">
+                  {/* Product Image */}
                   <img
-                    src={`http://localhost:5000/${product.images[0]}`}
+                    src={product.imageUrls[0]}
                     alt={product.title}
-                    className="h-48 w-full object-cover"
+                    className="h-48 w-full object-cover "
                   />
+
+                  {/* Offer badge */}
+                  <div className="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                    {product.offer}% OFF
+                  </div>
+
+                  {/* Favorite Icon */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
                       toggleFavorite(product._id);
                     }}
-                    className="absolute top-0 right-0 p-3 text-white transition-all"
-                    style={{ fontSize: '24px' }}
+                    className="absolute top-2 right-2 z-10"
                   >
-                    {favorites.includes(product._id) ? '❤️' : '🤍'}
+                    <FontAwesomeIcon
+                      icon={favorites.includes(product._id) ? solidHeart : regularHeart}
+                      className={`text-xl transition-colors duration-200 ${
+                        favorites.includes(product._id) ? 'text-red-500' : 'text-white'
+                      }`}
+                    />
                   </button>
+
+                  {/* Product Info */}
                   <div className="p-4">
-                    <h3 className="text-xl font-semibold text-gray-800 truncate" style={{ maxHeight: '2.5em' }}>
+                    <h3 className="text-lg font-semibold text-white truncate mb-1">
                       {product.title}
                     </h3>
-                    <p className="text-lg text-gray-600 mt-2">₹{product.price}</p>
-                    <p className="text-lg text-red-600 mt-1">{product.offer}% OFF</p>
+                    <p className="text-gray-300 text-sm mb-1">₹{product.price}</p>
                   </div>
                 </div>
               </Link>
             ))
           ) : (
-            <p className="text-center text-gray-600">No products found.</p>
+            <p className="text-center text-gray-400 w-full">No products found.</p>
           )}
         </div>
       </div>

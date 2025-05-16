@@ -2,143 +2,122 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const path = require("path");
-const fs = require("fs");
 const nodemailer = require("nodemailer");
+const { GridFSBucket } = require("mongodb");
 require("dotenv").config();
 
-// Routes
-const productRoutes = require("./routes/products");
-const userRoutes = require("./routes/auth");
-const paymentRoutes = require("./routes/payment");
-const reviewRoutes = require("./routes/reviews");
-
-// Models
-const Product = require("./models/Product");
-const User = require("./models/User");
-
-// App setup
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Serve static files (images)
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// MongoDB connection
-mongoose
-  .connect("mongodb+srv://jayanth:jayanth@cluster0.ubyck.mongodb.net/rentdrope", { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
-}
-
-// Middleware
-app.use(
-  cors({
-    origin: "http://localhost:3000", // React app's origin
-  })
-);
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configure Nodemailer
+// Global GridFS Bucket
+global.gfsBucket = null;
+
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+mongoose.connection.once("open", () => {
+  const db = mongoose.connection.db;
+  global.gfsBucket = new GridFSBucket(db, { bucketName: "uploads" });
+  console.log("✅ GridFSBucket initialized");
+});
+
+// Email setup
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Use your email service (Gmail in this case)
+  service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, // Your email (from environment variable)
-    pass: process.env.EMAIL_PASS, // Your email password or app password (from environment variable)
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
-// Function to send email to both the user and admin
-const sendEmail = async (userEmail, adminEmail, productTitle, orderAmount, selectedImage) => {
+
+const sendEmail = async (userEmail, adminEmail, productTitle, orderAmount, imageUrl) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER, // Your email address
-    to: `${userEmail}, ${adminEmail}`, // Send to both user and admin
+    from: process.env.EMAIL_USER,
+    to: `${userEmail}, ${adminEmail}`,
     subject: "Payment Successful",
-    text: `Dear User,
-
-Your payment of ₹${orderAmount} for the product "${productTitle}" has been successfully processed.
-
-Thank you for your purchase!
-
-Best regards,
-Your Company Name`,
-
-    html: `<p>Dear User,</p>
-           <p>Your payment of <strong>₹${orderAmount}</strong> for the product <strong>"${productTitle}"</strong> has been successfully processed.</p>
-           <img>"${selectedImage}</img>
-           <p>Thank you for your purchase!</p>
-           <p>Best regards,</p>
-           <p>Your Company Name</p>`,
+    html: `
+      <p>Dear User,</p>
+      <p>Your payment of <strong>₹${orderAmount}</strong> for <strong>${productTitle}</strong> is successful.</p>
+      ${imageUrl ? `<img src="${imageUrl}" alt="Product Image" style="width:300px;" />` : ''}
+      <p>Thanks for your purchase!</p>
+    `,
   };
 
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-        reject(error);
-      } else {
-        console.log("Email sent:", info.response);
-        resolve(info.response);
-      }
-    });
-  });
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("📧 Email sent to:", userEmail, adminEmail);
+  } catch (err) {
+    console.error("❌ Email error:", err.message);
+  }
 };
 
-// Routes
-app.use("/api/products", productRoutes);
-app.use("/api/auth", userRoutes);
-app.use("/api/payment", paymentRoutes);
-app.use("/api/reviews", reviewRoutes); // Route for reviews
+// Serve file from GridFS
+app.get("/file/:filename", async (req, res) => {
+  if (!global.gfsBucket) return res.status(500).json({ message: "GridFS not initialized" });
 
-// Payment success route (Send email after payment success)
+  try {
+    const files = await global.gfsBucket.find({ filename: req.params.filename }).toArray();
+    if (!files || files.length === 0) return res.status(404).json({ message: "File not found" });
+
+    const file = files[0];
+    res.set("Content-Type", file.contentType || "image/jpeg");
+    global.gfsBucket.openDownloadStreamByName(file.filename).pipe(res);
+  } catch (err) {
+    console.error("File error:", err.message);
+    res.status(500).json({ message: "Error retrieving file" });
+  }
+});
+
+// Debug route
+app.get("/files", async (req, res) => {
+  try {
+    const files = await global.gfsBucket.find().toArray();
+    res.json(files);
+  } catch (err) {
+    res.status(500).json({ message: "File listing error", error: err.message });
+  }
+});
+
+// Payment confirmation
+const Product = require("./models/Product");
+const User = require("./models/User");
+
 app.post("/api/payment/success", async (req, res) => {
   const { paymentData, productId } = req.body;
 
   try {
-    // Log incoming request for debugging
-    console.log("Received payment data:", paymentData);
-
-    // Fetch product details
     const product = await Product.findById(productId);
-    if (!product) {
-      console.error("Product not found");
-      return res.status(404).send("Product not found");
-    }
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Fetch admin email from the product's category (assuming category has adminEmail field)
-    const adminEmail = product.email; // Assuming product has an email field for admin
-    if (!adminEmail) {
-      console.error("Admin email not found for this product");
-      return res.status(404).send("Admin email not found for this product");
-    }
-
-    // Fetch user details from the payment data
+    const adminEmail = product.email;
     const user = await User.findById(paymentData.customerDetails.customer_id);
-    if (!user) {
-      console.error("User not found");
-      return res.status(404).send("User not found");
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    console.log("Sending email to user:", user.email);
-    console.log("Sending email to admin:", adminEmail);
+    const imageUrl = product.images.length
+      ? `${req.protocol}://${req.get("host")}/file/${product.images[0]}`
+      : null;
 
-    // Send email to both user and admin
-    await sendEmail(user.email, adminEmail, product.title, paymentData.orderAmount);
-
-    console.log("Emails sent successfully");
-    res.status(200).send("Payment successful, emails sent!");
-  } catch (error) {
-    console.error("Payment processing error:", error);
-    res.status(500).send("Error processing payment");
+    await sendEmail(user.email, adminEmail, product.title, paymentData.orderAmount, imageUrl);
+    res.status(200).json({ message: "Emails sent successfully" });
+  } catch (err) {
+    console.error("Payment route error:", err.message);
+    res.status(500).json({ message: "Error processing payment" });
   }
 });
 
+// Routes
+app.use("/api/products", require("./routes/products"));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/payment", require("./routes/payment"));
+app.use("/api/reviews", require("./routes/reviews"));
+
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

@@ -4,17 +4,17 @@ const sections = [
     { 
         title: "Welcome to Our Store", 
         subtitle: "Discover Amazing Products", 
-        image: "url('https://i.pinimg.com/564x/73/21/49/732149ed462b9fa091e9bdcff7b53d83.jpg')"
+        image: "url('https://i.pinimg.com/736x/bf/97/ab/bf97ab38490d4be1ef4cd42aee1aa986.jpg')"
     },
     { 
         title: "Exclusive Deals", 
         subtitle: "Shop Now and Save Big", 
-        image: "url('https://i.pinimg.com/564x/d5/bc/76/d5bc76c659c1b8ba0ccd64523de9b274.jpg')"
+        image: "url('https://i.pinimg.com/736x/de/7f/b2/de7fb2f12d2c2055f29835992c941cdb.jpg')"
     },
     { 
         title: "New Arrivals", 
         subtitle: "Explore Our Latest Collections", 
-        image: "url('https://i.pinimg.com/564x/7f/67/a1/7f67a123ef0b1195d42b76b17af6b2ac.jpg')"
+        image: "url('https://i.pinimg.com/736x/9b/48/d8/9b48d85737f78263df728ec7002eb110.jpg')"
     },
 ];
 
@@ -30,21 +30,39 @@ const Hero = () => {
     }, []);
 
     return (
-        <div className="relative w-full h-40 lg:h-96 sm:h-60 md:h-screen rounded-3xl overflow-hidden"> {/* Added rounded-lg and overflow-hidden here */}
+        <div className="relative w-full h-[60vh] ">
             <div 
                 className="absolute inset-0 bg-cover bg-center transition-all duration-1000" 
                 style={{ backgroundImage: sections[currentIndex].image }}
             >
-                <div className="bg-black bg-opacity-50 h-full w-full flex items-center justify-center">
-                    <div className="text-center p-4">
-                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white transition-opacity duration-500 ease-in-out">
-                            {sections[currentIndex].title}
-                        </h1>
-                        <h2 className="mt-2 text-lg md:text-xl lg:text-2xl text-gray-300 transition-opacity duration-500 ease-in-out">
-                            {sections[currentIndex].subtitle}
-                        </h2>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-gray-900/90">
+                    <div className="container mx-auto px-4 h-full flex items-center">
+                        <div className="max-w-2xl space-y-6">
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-light transition-opacity duration-500 ease-in-out">
+                                {sections[currentIndex].title}
+                            </h1>
+                            <h2 className="text-xl md:text-2xl lg:text-3xl text-gray-300 transition-opacity duration-500 ease-in-out">
+                                {sections[currentIndex].subtitle}
+                            </h2>
+                            <button className="mt-8 px-8 py-4 bg-accent text-light hover:bg-gray-700 transition-colors duration-200 rounded-square text-lg font-semibold">
+                                Shop Now
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
+            
+            {/* Navigation Dots */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
+                {sections.map((_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`w-3 h-3 rounded-square transition-colors duration-200 ${
+                            currentIndex === index ? 'bg-light' : 'bg-gray-500'
+                        }`}
+                    />
+                ))}
             </div>
         </div>
     );

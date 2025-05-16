@@ -1,5 +1,3 @@
-// src/components/SearchBar.js
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
@@ -9,36 +7,29 @@ const SearchBar = () => {
   const navigate = useNavigate();
 
   const handleSearch = () => {
-    if (searchTerm) {
-      navigate(`/search?term=${encodeURIComponent(searchTerm)}`);
+    if (searchTerm.trim()) {
+      navigate(`/search?term=${encodeURIComponent(searchTerm.trim())}`);
       setSearchTerm('');
-    } else {
-      console.log('No search term entered.'); 
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
     }
   };
 
   return (
-    <div className="flex items-center mt-2 md:mt-0">
-      <div className="relative">
+    <div className="w-full">
+      <div className="relative flex">
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={handleKeyDown} 
-          className="p-3 rounded-full border border-gray-300 bg-transparent text-white placeholder-gray-400 lg:w-[50rem] sm:w-40 sm:h-8"
-          placeholder="Search here..."
+          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          className="w-full p-3 pr-12 border border-gray-600 bg-black text-white placeholder-gray-400 focus:outline-none focus:border-gray-300 transition"
+          placeholder="Search products..."
         />
+
         <button
           onClick={handleSearch}
-          className="absolute inset-y-0 right-0 flex items-center pr-3"
+          className="absolute right-0 top-1/2 transform -translate-y-1/2  border border-gray-600 p-3.5 bg-white hover:bg-gray-700 transition"
         >
-          <FaSearch className="text-white" />
+          <FaSearch className="text-gray-900 text-lg" />
         </button>
       </div>
     </div>

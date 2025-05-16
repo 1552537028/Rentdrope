@@ -22,7 +22,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex items-center justify-center h-screen bg-gray-900">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96">
         <h2 className="mb-4 text-lg font-semibold">Login</h2>
         <div className="mb-4">
@@ -47,9 +47,9 @@ const Login = () => {
             className="border border-gray-300 p-2 rounded w-full"
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">Log In</button>
+        <button type="submit" className="bg-black text-white p-2 rounded w-full">Log In</button>
         <p className="mt-4 text-center">
-          Don't have an account? <Link to="/signup" className="text-blue-600">SignUp</Link>
+          Don't have an account? <Link to="/signup" className="text-gray-600">SignUp</Link>
         </p>
       </form>
     </div>

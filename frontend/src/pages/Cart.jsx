@@ -42,7 +42,7 @@ const Cart = () => {
                     <Link to={`/products/${item.id}`} className="text-xl">
                       <div className='flex flex-row'>
                         <img
-                          src={`http://localhost:5000/${item.images[0]}`}
+                          src={`http://localhost:5000/file/${item.images[0]}`}
                           alt={item.title}
                           className="w-16 h-16 mr-4"
                         />

@@ -1,95 +1,44 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { FaOpencart, FaCircleUser } from 'react-icons/fa6';
+import { FaOpencart } from 'react-icons/fa6';
 import SearchBar from './SearchBar';
 
 const Navbar = () => {
   const { cartLength } = useCart();
-  const isAuthenticated = localStorage.getItem('token'); 
 
   return (
-    <nav className="bg-slate-500 p-4 flex flex-row justify-between">
-      <div className="container flex justify-between items-start flex-row">
-        <div className=''>
-          <h1 className="text-white items-start text-lg mx-auto justify-start flex flex-row sm:mt-2 lg:mt-0">RentDrope</h1>
-        </div> 
-        <div className=''>
+    <>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-primary border-b-2 border-gray-800 shadow-square">
+        <div className="container lg:mx-auto flex items-center justify-between py-2 px-4">
+          <h1 className="text-light font-bold text-xl tracking-tight">VJ Wears</h1>
+
+          <div className="flex-1 mx-6">
             <SearchBar />
-        </div>
-        </div>
-        <div className="flex mt-3 mr-3 md:mt-0 justify-between">
-          <div className='mr-5 ml-3'>
-            <Link to="/cart" className="text-white flex flex-col items-end lg:text-3xl sm:text-2xl sm:ml-2">
-            <span className="relative">
-              <FaOpencart />
-              {cartLength > 0 && (
-                <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 sm:text-xs">
-                  {cartLength}
-                </span>
-              )}
-            </span>
-          </Link>
           </div>
-          <div>
-            <Link 
-            to={isAuthenticated ? "/profile" : "/login"}
-            className="text-white flex items-center lg:text-3xl sm:text-2xl"
-          >
-            <FaCircleUser />
-          </Link>
+
+          <div className="flex items-center space-x-6">
+            <Link
+              to="/cart"
+              className="text-light hover:text-gray-300 transition-colors duration-200"
+            >
+              <div className="relative">
+                <FaOpencart className="text-3xl" />
+                {cartLength > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-accent text-light text-xs font-bold rounded-square px-2 py-1">
+                    {cartLength}
+                  </span>
+                )}
+              </div>
+            </Link>
           </div>
-          
         </div>
-    </nav>
+      </nav>
+
+      {/* Spacer div for bottom margin */}
+      <div className="h-16" />
+    </>
   );
 };
 
 export default Navbar;
-
-//gitcode
-/**import React from 'react';
-import { Link } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
-import { FaOpencart, FaCircleUser } from 'react-icons/fa6';
-import SearchBar from './SearchBar';
-
-const Navbar = () => {
-  const { cartLength } = useCart();
-  const isAuthenticated = localStorage.getItem('token'); 
-
-  return (
-    <nav className="bg-gray-800 justify-between flex flex-row p-4">
-      <div className="container flex justify-between items-start flex-row">
-        <h1 className="text-white items-start text-lg mr-2 lg:mt-0 sm:mt-2">My Store</h1>
-        <SearchBar />
-        <div className="flex mt-3 mr-3 justify-between">
-          <div className="mr-5 ml-3">
-           <Link to="/cart" className="text-white flex flex-col items-end lg:text-3xl sm:text-2xl">
-            <span className="relative">
-              <FaOpencart />
-              {cartLength > 0 && (
-                <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full px-1 sm:text-xs">
-                  {cartLength}
-                </span>
-              )}
-            </span>
-          </Link>
-          </div>
-         <div>
-         <Link 
-            to={isAuthenticated ? "/profile" : "/login"}
-            className="text-white flex items-center lg:text-3xl sm:text-2xl"
-          >
-            <FaCircleUser />
-          </Link>
-         </div>
-          
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-export default Navbar;
- */

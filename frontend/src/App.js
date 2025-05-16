@@ -13,6 +13,7 @@ import Profile from './pages/Profile';
 import FavoritesPage from './pages/FavoritesPage';
 import SearchResults from './pages/SearchResults';
 import ProductDetails from './components/ProductDetails';
+import CategoryProductsPage from './components/CategoryProductsPage';
 
 function App() {
     return (
@@ -29,6 +30,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/search" element={<SearchResults />} />
                     <Route path="/category" element={<ProductDetails />} />
+                    <Route path="/category/:categoryName" element={<CategoryProductsPage />} />
                     <Route path="/favorites" element={<FavoritesPage />} />
       
                 </Routes>
