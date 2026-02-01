@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { Link } from 'react-router-dom';
 function Footer() {
   return (
     <footer className="flex flex-col items-start self-stretch pt-7 pr-16 pb-16 pl-3.5 mt-3 w-full text-xs text-black bg-primary">
@@ -111,12 +111,12 @@ function Footer() {
         </p>
       </div>
       <li>
-        <a
-          href="/admin"
+        <Link
+          to="/admin"
           className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-sm"
         >
           Admin
-        </a>
+        </Link>
       </li>
       
     </footer>
