@@ -14,7 +14,7 @@ const CategoryProductsPage = () => {
   useEffect(() => {
     const fetchCategoryProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products');
+        const response = await axios.get('https://rentdrope-1.onrender.com/api/products');
         const filtered = response.data.filter(p => p.category === categoryName);
         setProducts(filtered);
       } catch (error) {
