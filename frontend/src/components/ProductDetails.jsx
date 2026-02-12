@@ -16,7 +16,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchProductsAndCategories = async () => {
       try {
-        const productResponse = await axios.get('http://localhost:5000/api/products');
+        const productResponse = await axios.get('https://rentdrope-1.onrender.com/api/products');
         setProducts(productResponse.data);
         setFilteredProducts(productResponse.data);
 
