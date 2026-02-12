@@ -8,7 +8,7 @@ const RelatedProducts = ({ category, currentProductId }) => {
   useEffect(() => {
     const fetchRelated = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch("https://rentdrope-1.onrender.com/api/products");
         const all = await res.json();
         const filtered = all.filter(
           (item) => item.category === category && item._id !== currentProductId
