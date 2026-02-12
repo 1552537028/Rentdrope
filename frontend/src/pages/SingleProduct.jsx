@@ -44,7 +44,7 @@ function SingleProduct() {
     const userId = getUserFromToken();
     if (userId) {
       const token = localStorage.getItem("token");
-      axios.get("http://localhost:5000/api/auth/me", {
+      axios.get("https://rentdrope-1.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       }).then(res => setUser(res.data)).catch(console.error);
     }
@@ -53,13 +53,13 @@ function SingleProduct() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productRes = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const productRes = await axios.get(`https://rentdrope-1.onrender.com/api/products/${id}`);
         setProduct(productRes.data);
         if (productRes.data.images?.length > 0) {
           setSelectedImage(productRes.data.images[0]);
         }
 
-        const reviewRes = await axios.get(`http://localhost:5000/api/reviews/products/${id}`);
+        const reviewRes = await axios.get(`https://rentdrope-1.onrender.com/api/reviews/products/${id}`);
         setReviews(reviewRes.data);
       } catch (error) {
         console.error("Error fetching product or reviews:", error);
@@ -103,7 +103,7 @@ function SingleProduct() {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/api/payment/initiate", paymentData);
+      const res = await axios.post("https://rentdrope-1.onrender.com/api/payment/initiate", paymentData);
       const { payment_session_id } = res.data;
       if (payment_session_id) {
         const cashfree = await load({ mode: "sandbox" });
@@ -111,7 +111,7 @@ function SingleProduct() {
           paymentSessionId: payment_session_id,
           redirectTarget: "_modal",
         }).then(async () => {
-          await axios.post("http://localhost:5000/api/payment/success", {
+          await axios.post("https://rentdrope-1.onrender.com/api/payment/success", {
             paymentData,
             productId: product._id,
           });
@@ -160,7 +160,7 @@ function SingleProduct() {
               </button>
 
               <img
-                src={`http://localhost:5000/file/${selectedImage}`}
+                src={`https://rentdrope-1.onrender.com/file/${selectedImage}`}
                 alt="Selected"
                 className="object-cover w-full h-96"
               />
@@ -170,7 +170,7 @@ function SingleProduct() {
               {product.images.map((img, i) => (
                 <img
                   key={i}
-                  src={`http://localhost:5000/file/${img}`}
+                  src={`https://rentdrope-1.onrender.com/file/${img}`}
                   onClick={() => setSelectedImage(img)}
                   alt="Thumbnail"
                   className={`h-16 w-16 object-cover border-2 cursor-pointer ${
