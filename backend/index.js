@@ -7,9 +7,9 @@ const { GridFSBucket } = require("mongodb");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || "https://rentdrope-1.onrender.com";
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "https://rentdrope.onrender.com", credentials: true }));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
