@@ -40,7 +40,7 @@ const Signup = () => {
     setError(null); // Reset error state
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/signup', formData);
+      const response = await axios.post('https://rentdrope-1.onrender.com/api/auth/signup', formData);
       console.log('Signup successful:', response.data);
       navigate('/login'); // Redirect to login after signup
     } catch (error) {
