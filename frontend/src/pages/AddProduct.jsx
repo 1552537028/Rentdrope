@@ -17,7 +17,7 @@ function ProductPage() {
   const [viewMode, setViewMode] = useState('add');
   const [editingProductId, setEditingProductId] = useState(null);
 
-  const API_URL = 'http://localhost:5000';
+  const API_URL = 'https://rentdrope-1.onrender.com';
 
   useEffect(() => {
     fetchProducts();
